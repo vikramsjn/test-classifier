@@ -20,7 +20,7 @@ import com.databorough.utils.SQLUtils;
  * @author TESTER
  * @version (2010-06-01.01:46:08)
  */
-public class AabcrepF {
+public class SomeJava {
 	/**
 	 * Current file instance.
 	 */
