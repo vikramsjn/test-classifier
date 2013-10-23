@@ -1,0 +1,322 @@
+package Afinzsoft.data;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import com.databorough.utils.ConnectionManager;
+import com.databorough.utils.HQLUtils;
+import com.databorough.utils.HibernateUtils;
+import com.databorough.utils.ReflectionUtils;
+import com.databorough.utils.SQLUtils;
+
+/**
+ * I/O for ClientCompanyProfilePhysicalFile (AABCREP).
+ *
+ * @author TESTER
+ * @version (2010-06-01.01:46:08)
+ */
+public class AabcrepF {
+	/**
+	 * Current file instance.
+	 */
+	public Aabcrep aabcrep = new Aabcrep();
+
+	/**
+	 * Previous file instance, used for checking the integrity of the Update/Add
+	 * operation.
+	 */
+	public Aabcrep prevAabcrep = new Aabcrep();
+
+	private Connection conn;
+
+	/**
+	 * Default constructor.
+	 */
+	public AabcrepF() {
+		// Get Connection
+		ConnectionManager connMgr = new ConnectionManager();
+		conn = connMgr.getConnection();
+	}
+
+	/**
+	 * Reads the data.
+	 *
+	 * @return <code>true</code> if HQL SELECT was successful
+	 * @throws SQLException if a database access error occurs
+	 * @since (2010-06-01.01:46:08)
+	 */
+	public boolean read() throws SQLException {
+		Session session = null;
+
+		try {
+			session = HibernateUtils.getSession(conn);
+
+			StringBuffer qry =
+				new StringBuffer("SELECT aabcrep.X001_Client_Number, aabcrep.X014_Date_of_Incorporation, ")
+				.append("aabcrep.Corporate_Type, aabcrep.X014_Reserve_Bank_Coding, aabcrep.X014_Financial_Yr_End_Date, ")
+				.append("aabcrep.X014_SWIFT_ID, aabcrep.X014_Credit_Rating, aabcrep.Company_Registration_Nbr, ")
+				.append("aabcrep.X014_REUTER_ID, aabcrep.CTY_Country_Code, aabcrep.IND_Industry_Code_1, ")
+				.append("aabcrep.IND_Industry_Code_2, aabcrep.IND_Industry_Code_3, aabcrep.CCP_Trading_Name, ")
+				.append("aabcrep.CCP_Number_of_FTE_s, aabcrep.ACT_Accommodation_Type, aabcrep.CCP_Charity_Y_N, ")
+				.append("aabcrep.CCP_ARBN, aabcrep.CCP_Foreign_Reg_No, aabcrep.CCP_Spare_Date_1, ")
+				.append("aabcrep.CCP_Spare_Date_2, aabcrep.CCP_Spare_Flag_1, aabcrep.CCP_Spare_Flag_2, ")
+				.append("aabcrep.CCP_Spare_Flag_3, aabcrep.CCP_Spare_Flag_4, aabcrep.CCP_Spare_Code_10_1, ")
+				.append("aabcrep.CCP_Spare_Code_10_2, aabcrep.CCP_Spare_Code_10_3, aabcrep.CCP_Spare_Code_10_4")
+			.append(" FROM ClientCompanyProfilePhysicalFile aabcrep")
+			.append(" WHERE");
+
+			if (aabcrep.X001_Client_Number != null) {
+				qry.append(" aabcrep.X001_Client_Number = '" + SQLUtils.escape(aabcrep.X001_Client_Number) + "'");
+			}
+
+			if (qry.toString().endsWith(" WHERE")) {
+				// Remove the ending WHERE
+				qry.setLength(qry.length() - 6);
+			}
+
+			System.out.println("AabcrepF::read() : " + qry);
+
+			Query query = session.createQuery(qry.toString());
+			List list = query.list();
+
+			if (list.size() > 0) {
+				HQLUtils.setValues(prevAabcrep, list, qry.toString());
+				ReflectionUtils.initializeClass(aabcrep, prevAabcrep, true);
+
+				return true;
+			}
+		}
+		finally {
+			session.close();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Updates the data.
+	 *
+	 * @return <code>true</code> if HQL UPDATE was successful
+	 * @throws SQLException if a database access error occurs
+	 * @since (2010-06-01.01:46:08)
+	 */
+	public boolean update() throws SQLException {
+		/**
+		 * Check the integrity of the Update operation to make sure that no
+		 * other user modified the record concurrently.
+		 */
+		AabcrepF aabcrepF = new AabcrepF();
+		aabcrepF.aabcrep.X001_Client_Number = prevAabcrep.X001_Client_Number;
+		boolean bStatus = aabcrepF.read();
+
+		if (bStatus) {
+			if (!ReflectionUtils.equals(aabcrepF.aabcrep, prevAabcrep)) {
+				String errorMessage =
+					"The record has already been updated by someone";
+				throw new SQLException(errorMessage);
+			}
+		}
+		else {
+			String errorMessage = "The record does not exist";
+			throw new SQLException(errorMessage);
+		}
+
+		Session session = null;
+
+		try {
+			session = HibernateUtils.getSession(conn);
+
+			StringBuffer qry = new StringBuffer("UPDATE ClientCompanyProfilePhysicalFile aabcrep SET ");
+			qry.append("aabcrep.X001_Client_Number = '" + SQLUtils.escape(aabcrep.X001_Client_Number) + "', ")
+			.append("aabcrep.X014_Date_of_Incorporation = " + aabcrep.X014_Date_of_Incorporation + ", ")
+			.append("aabcrep.Corporate_Type = '" + SQLUtils.escape(aabcrep.Corporate_Type) + "', ")
+			.append("aabcrep.X014_Reserve_Bank_Coding = '" + SQLUtils.escape(aabcrep.X014_Reserve_Bank_Coding) + "', ")
+			.append("aabcrep.X014_Financial_Yr_End_Date = " + aabcrep.X014_Financial_Yr_End_Date + ", ")
+			.append("aabcrep.X014_SWIFT_ID = '" + SQLUtils.escape(aabcrep.X014_SWIFT_ID) + "', ")
+			.append("aabcrep.X014_Credit_Rating = '" + SQLUtils.escape(aabcrep.X014_Credit_Rating) + "', ")
+			.append("aabcrep.Company_Registration_Nbr = '" + SQLUtils.escape(aabcrep.Company_Registration_Nbr) + "', ")
+			.append("aabcrep.X014_REUTER_ID = '" + SQLUtils.escape(aabcrep.X014_REUTER_ID) + "', ")
+			.append("aabcrep.CTY_Country_Code = '" + SQLUtils.escape(aabcrep.CTY_Country_Code) + "', ")
+			.append("aabcrep.IND_Industry_Code_1 = '" + SQLUtils.escape(aabcrep.IND_Industry_Code_1) + "', ")
+			.append("aabcrep.IND_Industry_Code_2 = '" + SQLUtils.escape(aabcrep.IND_Industry_Code_2) + "', ")
+			.append("aabcrep.IND_Industry_Code_3 = '" + SQLUtils.escape(aabcrep.IND_Industry_Code_3) + "', ")
+			.append("aabcrep.CCP_Trading_Name = '" + SQLUtils.escape(aabcrep.CCP_Trading_Name) + "', ")
+			.append("aabcrep.CCP_Number_of_FTE_s = " + aabcrep.CCP_Number_of_FTE_s + ", ")
+			.append("aabcrep.ACT_Accommodation_Type = '" + SQLUtils.escape(aabcrep.ACT_Accommodation_Type) + "', ")
+			.append("aabcrep.CCP_Charity_Y_N = '" + SQLUtils.escape(aabcrep.CCP_Charity_Y_N) + "', ")
+			.append("aabcrep.CCP_ARBN = '" + SQLUtils.escape(aabcrep.CCP_ARBN) + "', ")
+			.append("aabcrep.CCP_Foreign_Reg_No = '" + SQLUtils.escape(aabcrep.CCP_Foreign_Reg_No) + "', ")
+			.append("aabcrep.CCP_Spare_Date_1 = " + aabcrep.CCP_Spare_Date_1 + ", ")
+			.append("aabcrep.CCP_Spare_Date_2 = " + aabcrep.CCP_Spare_Date_2 + ", ")
+			.append("aabcrep.CCP_Spare_Flag_1 = '" + SQLUtils.escape(aabcrep.CCP_Spare_Flag_1) + "', ")
+			.append("aabcrep.CCP_Spare_Flag_2 = '" + SQLUtils.escape(aabcrep.CCP_Spare_Flag_2) + "', ")
+			.append("aabcrep.CCP_Spare_Flag_3 = '" + SQLUtils.escape(aabcrep.CCP_Spare_Flag_3) + "', ")
+			.append("aabcrep.CCP_Spare_Flag_4 = '" + SQLUtils.escape(aabcrep.CCP_Spare_Flag_4) + "', ")
+			.append("aabcrep.CCP_Spare_Code_10_1 = '" + SQLUtils.escape(aabcrep.CCP_Spare_Code_10_1) + "', ")
+			.append("aabcrep.CCP_Spare_Code_10_2 = '" + SQLUtils.escape(aabcrep.CCP_Spare_Code_10_2) + "', ")
+			.append("aabcrep.CCP_Spare_Code_10_3 = '" + SQLUtils.escape(aabcrep.CCP_Spare_Code_10_3) + "', ")
+			.append("aabcrep.CCP_Spare_Code_10_4 = '" + SQLUtils.escape(aabcrep.CCP_Spare_Code_10_4) + "'")
+			.append(" WHERE aabcrep.X001_Client_Number = '" + SQLUtils.escape(prevAabcrep.X001_Client_Number) + "'");
+
+			System.out.println("AabcrepF::update() : " + qry);
+
+			Query query = session.createQuery(qry.toString());
+
+			int numRows = query.executeUpdate();
+
+			if (numRows > 0) {
+				ReflectionUtils.initializeClass(prevAabcrep, aabcrep, false);
+			}
+
+			return (numRows > 0);
+		}
+		finally {
+			session.close();
+		}
+	}
+
+	/**
+	 * Adds the data.
+	 *
+	 * @return <code>true</code> if SQL INSERT was successful
+	 * @throws SQLException if a database access error occurs
+	 * @since (2010-06-01.01:46:08)
+	 */
+	public boolean add() throws SQLException {
+		/**
+		 * Check the integrity of the Add operation to make sure that the record
+		 * does not already exist.
+		 */
+		boolean bStatus = read();
+
+		if (bStatus) {
+			String errorMessage = "The record already exists";
+			throw new SQLException(errorMessage);
+		}
+
+		Statement stmt = null;
+
+		try {
+			stmt = conn.createStatement();
+
+			StringBuffer qry = new StringBuffer("INSERT INTO AABCREP(");
+			qry.append("\"#1ABCD\", \"#1ARDT\", BCSKSZ, \"#1DTTX\", \"#1ASDT\", \"#1G4TX\", ")
+			.append("\"#1G5TX\", \"#1G6TX\", \"#1G7TX\", \"#1AOCD\", \"#1C5CD\", \"#1C6CD\", ")
+			.append("\"#1C7CD\", BCKNR, BCBGNE, BCSOCF, BCKSS6, BCI4CJ, ")
+			.append("BCI5CJ, BCE3DA, BCGTDA, BCN3S5, BCN4S5, BCN5S5, ")
+			.append("BCN6S5, BCVNCI, BCVOCI, BCVPCI, BCVQCI)")
+			.append(" VALUES(");
+			qry.append("'" + SQLUtils.escape(aabcrep.X001_Client_Number) + "', ")
+			.append(aabcrep.X014_Date_of_Incorporation + ", ")
+			.append("'" + SQLUtils.escape(aabcrep.Corporate_Type) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.X014_Reserve_Bank_Coding) + "', ")
+			.append(aabcrep.X014_Financial_Yr_End_Date + ", ")
+			.append("'" + SQLUtils.escape(aabcrep.X014_SWIFT_ID) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.X014_Credit_Rating) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.Company_Registration_Nbr) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.X014_REUTER_ID) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CTY_Country_Code) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.IND_Industry_Code_1) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.IND_Industry_Code_2) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.IND_Industry_Code_3) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Trading_Name) + "', ")
+			.append(aabcrep.CCP_Number_of_FTE_s + ", ")
+			.append("'" + SQLUtils.escape(aabcrep.ACT_Accommodation_Type) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Charity_Y_N) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_ARBN) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Foreign_Reg_No) + "', ")
+			.append(aabcrep.CCP_Spare_Date_1 + ", ")
+			.append(aabcrep.CCP_Spare_Date_2 + ", ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Spare_Flag_1) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Spare_Flag_2) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Spare_Flag_3) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Spare_Flag_4) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Spare_Code_10_1) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Spare_Code_10_2) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Spare_Code_10_3) + "', ")
+			.append("'" + SQLUtils.escape(aabcrep.CCP_Spare_Code_10_4) + "')");
+
+			System.out.println("AabcrepF::add() : " + qry);
+			int numRows = stmt.executeUpdate(qry.toString());
+
+			return (numRows > 0);
+		}
+		finally {
+			SQLUtils.close(null, stmt);
+		}
+	}
+
+	/**
+	 * Deletes the data.
+	 *
+	 * @return <code>true</code> if HQL DELETE was successful
+	 * @throws SQLException if a database access error occurs
+	 * @since (2010-06-01.01:46:08)
+	 */
+	public boolean delete() throws SQLException {
+		Session session = null;
+
+		try {
+			session = HibernateUtils.getSession(conn);
+
+			StringBuffer qry = new StringBuffer("DELETE FROM ClientCompanyProfilePhysicalFile aabcrep")
+			.append(" WHERE aabcrep.X001_Client_Number = '" + SQLUtils.escape(prevAabcrep.X001_Client_Number) + "'");
+
+			System.out.println("AabcrepF::delete() : " + qry);
+			Query query = session.createQuery(qry.toString());
+			int numRows = query.executeUpdate();
+
+			return (numRows > 0);
+		}
+		finally {
+			session.close();
+		}
+	}
+
+	/**
+	 * Checks if record exists.
+	 *
+	 * @return <code>true</code> if record exists
+	 * @throws SQLException if a database access error occurs
+	 * @since (2010-06-01.01:46:19)
+	 */
+	public static boolean recordExists(String parm0) throws SQLException {
+		AabcrepF aabcrepF = new AabcrepF();
+		aabcrepF.aabcrep.X001_Client_Number = parm0;
+
+		return aabcrepF.read();
+	}
+
+	/**
+	 * Checks if record exists.
+	 *
+	 * @return <code>true</code> if record exists
+	 * @throws SQLException if a database access error occurs
+	 * @since (2010-06-01.01:54:42)
+	 */
+	public static boolean recordExists() throws SQLException {
+		AabcrepF aabcrepF = new AabcrepF();
+
+		return aabcrepF.read();
+	}
+
+	/**
+	 * Gets descriptor.
+	 *
+	 * @return descriptor
+	 * @throws SQLException if a database access error occurs
+	 * @since (2010-06-01.01:46:21)
+	 */
+	public static String getDescriptor(String parm0) throws SQLException {
+		AabcrepF aabcrepF = new AabcrepF();
+		aabcrepF.aabcrep.X001_Client_Number = parm0;
+		aabcrepF.read();
+
+		return aabcrepF.aabcrep.X001_Client_Number;
+	}
+}
