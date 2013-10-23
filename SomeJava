@@ -1,4 +1,4 @@
-package Afinzsoft.data;
+package finz.data;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -8,14 +8,14 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import com.databorough.utils.ConnectionManager;
-import com.databorough.utils.HQLUtils;
-import com.databorough.utils.HibernateUtils;
-import com.databorough.utils.ReflectionUtils;
-import com.databorough.utils.SQLUtils;
+import com.db.utils.ConnectionManager;
+import com.db.utils.HQLUtils;
+import com.db.utils.HibernateUtils;
+import com.db.utils.ReflectionUtils;
+import com.db.utils.SQLUtils;
 
 /**
- * I/O for ClientCompanyProfilePhysicalFile (AABCREP).
+ * I/O for ClientCompanyProfilePhysicalFile ().
  *
  * @author TESTER
  * @version (2010-06-01.01:46:08)
